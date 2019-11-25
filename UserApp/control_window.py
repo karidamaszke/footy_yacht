@@ -25,6 +25,7 @@ class ControlWindow(QWidget):
 
         self.client = Client(self.ip)
         self.camera_image_receiver = CameraImageReceiver(self.ip)
+        self.camera_is_on = False
 
         self.camera_image_frame = QGraphicsView(self)
         self.camera_image = QGraphicsScene(self)
@@ -102,7 +103,7 @@ class ControlWindow(QWidget):
 
         self.camera_image_frame.setGeometry(QRect(26, 70, 514, 386))
         self.camera_image_frame.setScene(self.camera_image)
-        self.displayed_camera_image = self.camera_image.addPixmap(QPixmap(QImage()))
+        self.displayed_camera_image = self.camera_image.addPixmap(QPixmap(QImage("blank.png")))
 
         self.retranslate_ui()
 
@@ -132,11 +133,15 @@ class ControlWindow(QWidget):
             client.connect(hostname=self.ip, port=SSH_PORT,
                            username=self.login, password=self.password)
             client.exec_command(command)
-            sleep(4)
 
             client.close()
 
+            if "stop" in command:
+                self.camera_is_on = False
+
             if "start" in command:
+                sleep(3)
+                self.camera_is_on = True
                 self.init_camera_receiver()
 
         except Exception as err:
@@ -158,7 +163,7 @@ class ControlWindow(QWidget):
 
     @pyqtSlot(QPixmap)
     def camera_image_update(self, current_image):
-        self.displayed_camera_image.setPixmap(current_image)
+        self.displayed_camera_image.setPixmap(current_image if self.camera_is_on else QPixmap("blank.png"))
 
     @staticmethod
     def error_message(error_title, error_message):

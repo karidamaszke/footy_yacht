@@ -71,7 +71,7 @@ class LoggerWindow(QWidget):
     def retranslate_ui(self):
         self.setWindowTitle("Logger")
 
-        self.title.setText("Connect to footy:")
+        self.title.setText("Connect to Footy:")
         self.ip_label.setText("IP")
         self.login_label.setText("login")
         self.password_label.setText("password")
